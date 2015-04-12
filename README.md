@@ -1,4 +1,4 @@
-# shopping-cart-challenge
+# shopping cart challenge
 
 This is a minimalistic shopping cart application, produced for a technical interview. 
 
