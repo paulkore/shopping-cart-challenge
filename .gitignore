@@ -55,3 +55,18 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# IntellijJ IDEA metadata
+.idea
+
+# SQLite database contents (used for development early on)
+*.sqlite3
+
+
+
+# =========================
+# Project files
+# =========================
+
+# All sorts of embarrassing throw-away code
+sandbox
