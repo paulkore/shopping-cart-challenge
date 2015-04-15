@@ -60,9 +60,9 @@
                 </div>
 
                 <div class="form-controls" ng-switch="orderStatus">
-                    <button ng-switch-when="EDIT" ng-click="reviewOrder(item, $event)">Review order</button>
-                    <button ng-switch-when="REVIEW" ng-click="modifyOrder(item, $event)">Modify order</button>
-                    <button ng-switch-when="REVIEW" ng-click="confirmOrder(item, $event)">Confirm order</button>
+                    <button ng-switch-when="EDIT" ng-click="reviewOrder(item, $event)">Review</button>
+                    <button ng-switch-when="REVIEW" ng-click="modifyOrder(item, $event)">Back</button>
+                    <button ng-switch-when="REVIEW" ng-click="confirmOrder(item, $event)">Confirm</button>
                 </div>
             </form>
 
