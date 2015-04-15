@@ -41,14 +41,21 @@
                     <div class="product-col product-col-price product-col-numeric">
                         {{ product.price }}
                     </div>
-                    <div class="product-col product-col-quantity">
-                        <input type="checkbox" ng-model="product.check">
-                        <input type="text" ng-model="product.quantity">
+                    <div class="product-col product-col-quantity" ng-switch="orderStatus">
+                        <div ng-switch-when="EDIT">
+                            <input type="checkbox" ng-model="product.check">
+                            <input type="text" ng-model="product.quantity">
+                        </div>
+                        <div ng-switch-when="REVIEW">
+                            {{ product.quantity }}
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-controls">
-                    <button ng-click="reviewOrder(item, $event)">Review order</button>
+                <div class="form-controls" ng-switch="orderStatus">
+                    <button ng-switch-when="EDIT" ng-click="reviewOrder(item, $event)">Review order</button>
+                    <button ng-switch-when="REVIEW" ng-click="modifyOrder(item, $event)">Modify order</button>
+                    <button ng-switch-when="REVIEW" ng-click="confirmOrder(item, $event)">Confirm order</button>
                 </div>
             </form>
 

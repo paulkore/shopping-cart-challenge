@@ -2,9 +2,11 @@ appModule = angular.module("ShoppingCartChallenge", []);
 
 appModule.controller("OrderController", function($scope, $location, $http) {
 
-
-        $scope.orderId = null;
         $scope.formTitle = 'New order';
+        $scope.orderId = null;
+        $scope.orderStatus = null;
+        $scope.products = null;
+        $scope.ajaxError = null;
 
         // decide whether it's a new or an existing order based on the URL
         // (feels wrong, but it'll do for now)
@@ -14,11 +16,9 @@ appModule.controller("OrderController", function($scope, $location, $http) {
             // TODO: improve this ID extraction code, as it is unreliable (it grabs the right-most numeric value)
             var numericValues = $scope.url.match( /\d+/g);
             $scope.orderId = Number(numericValues.last());
-            $scope.formTitle = 'Edit order';
         }
 
-        $scope.products = null;
-        $scope.ajaxError = null;
+
 
         $scope.loadEmptyOrder = function() {
             console.log('loading data for empty order');
@@ -38,6 +38,7 @@ appModule.controller("OrderController", function($scope, $location, $http) {
                     $scope.products.push(product)
                 }
 
+                $scope.formTitle = 'New order';
                 $scope.ajaxError = null;
             });
             promise.error(function(data) {
@@ -59,6 +60,7 @@ appModule.controller("OrderController", function($scope, $location, $http) {
 
                 var promise = $http.get("/api/orders/" + $scope.orderId);
                 promise.success(function(data) {
+                    $scope.orderStatus = data.order_status;
                     var product_quantity_list = data.products;
                     for (var i=0; i<product_quantity_list.length; i++) {
                         var product_quantity_data = product_quantity_list[i];
@@ -69,6 +71,16 @@ appModule.controller("OrderController", function($scope, $location, $http) {
                             product.quantity = product_quantity_data.quantity;
                             product.check = product_quantity_data.quantity > 0;
                         }
+                    }
+
+                    if ($scope.orderStatus == 'EDIT') {
+                        $scope.formTitle = 'Edit order';
+                    }
+                    else if ($scope.orderStatus == 'REVIEW') {
+                        $scope.formTitle = 'Review order';
+                    }
+                    else {
+                        $scope.formTitle = 'Foo'
                     }
 
                     $scope.ajaxError = null;
@@ -97,8 +109,20 @@ appModule.controller("OrderController", function($scope, $location, $http) {
             return null;
         };
 
+        $scope.modifyOrder = function() {
+            console.log('submitting order for modification');
+
+            alert('not implemented')
+        };
+
         $scope.reviewOrder = function() {
             console.log('submitting order for review');
+
+            alert('not implemented')
+        };
+
+        $scope.confirmOrder = function() {
+            console.log('submitting order for confirmation');
 
             alert('not implemented')
         };
