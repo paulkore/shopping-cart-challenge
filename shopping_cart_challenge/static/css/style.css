@@ -1,0 +1,102 @@
+body {
+    padding: 0;
+    margin: 0;
+    min-width: 350px;
+    min-height: 0;
+
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+
+    background: #CCCCCC;
+    color: #000000;
+}
+
+.mainWrapper {
+    display: table;
+    margin: 0 auto;
+
+    box-sizing: border-box;
+    min-width: 900px;
+    min-height: 500px;
+    padding: 20px 15px 50px 15px;
+
+    background: #FEFEFE;
+}
+
+.form-title {
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 20px;
+
+    color: #747474;
+}
+
+.ajax-controls {
+
+}
+
+.error-message {
+    color: #EE0000;
+    font-weight: bold;
+}
+
+.product-table {
+    display: table;
+    margin-top: 20px;
+}
+
+.product-header {
+    margin-bottom: 10px;
+}
+
+.product-row {
+    margin-bottom: 4px;
+}
+
+.product-col {
+    display: table-cell;
+
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.product-col.product-col-header {
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: bold;
+
+    background: #747474;
+    color: #FEFEFE;
+}
+
+.product-col-numeric {
+    text-align: right;
+}
+
+.product-col-name {
+    min-width: 400px;
+    padding-left: 10px;
+}
+
+.product-col-price {
+    min-width: 75px;
+}
+
+.product-col-quantity {
+    min-width: 100px;
+    padding-left: 20px;
+}
+
+.product-col-quantity input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.product-col-quantity input[type="text"] {
+    width: 50px;
+}
+
+.form-controls {
+    margin-top: 25px;
+}
+

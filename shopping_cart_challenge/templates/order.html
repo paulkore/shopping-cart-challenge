@@ -1,0 +1,57 @@
+{% load staticfiles %}
+{% load custom_filters %}
+
+<html>
+    <head>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+        <script src="{% static 'js/lib/angular.js' %}"></script>
+{#        <script src="{% static 'js/lib/angular.min.js' %}"></script>#}
+        <script src="{% static 'js/app/app.js' %}"></script>
+    </head>
+
+    {% verbatim %}
+    <body ng-app="ShoppingCartChallenge">
+
+        <div class="mainWrapper" ng-controller="OrderController" >
+
+            <div class="form-title">
+                New order
+            </div>
+
+            <div class="ajax-controls" ng-if="!autoLoad">
+                AJAX actions:
+                <button ng-click="loadNewOrder(item, $event)">Load new order form</button>
+                <div class="error-message" ng-if="ajaxError" ng-bind="ajaxError"></div>
+            </div>
+
+            <form class="product-table" ng-if="products">
+
+                <div class="product-header">
+                     <div class="product-col product-col-header product-col-name">Product</div>
+                     <div class="product-col product-col-header product-col-price">Price</div>
+                     <div class="product-col product-col-header product-col-quantity">Quantity</div>
+                </div>
+
+                <div class="product-row" ng-repeat="product in products">
+                    <div class="product-col product-col-name">
+                        {{ product.name }}
+                    </div>
+                    <div class="product-col product-col-price product-col-numeric">
+                        {{ product.price }}
+                    </div>
+                    <div class="product-col product-col-quantity">
+                        <input type="checkbox" ng-model="product.check">
+                        <input type="text" ng-model="product.quantity">
+                    </div>
+                </div>
+
+                <div class="form-controls">
+                    <button ng-click="reviewOrder(item, $event)">Review order</button>
+                </div>
+            </form>
+
+        </div>
+
+    </body>
+    {% endverbatim %}
+</html>
