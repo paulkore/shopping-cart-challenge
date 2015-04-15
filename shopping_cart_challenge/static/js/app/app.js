@@ -1,16 +1,17 @@
 appModule = angular.module("ShoppingCartChallenge", []);
 
 appModule.controller("OrderController", function($scope, $location, $http) {
-        // behavior altering flag (for dev purposes)
-        $scope.autoLoad = true;
+
 
         $scope.orderId = null;
         $scope.formTitle = 'New order';
 
+        // decide whether it's a new or an existing order based on the URL
+        // (feels wrong, but it'll do for now)
         $scope.url = $location.absUrl();
         console.log('url = ' + $scope.url);
         if (!$scope.url.contains('orders/new')) {
-            // TODO: this is still error prone
+            // TODO: improve this ID extraction code, as it is unreliable (it grabs the right-most numeric value)
             var numericValues = $scope.url.match( /\d+/g);
             $scope.orderId = Number(numericValues.last());
             $scope.formTitle = 'Edit order';
@@ -50,7 +51,7 @@ appModule.controller("OrderController", function($scope, $location, $http) {
         $scope.loadExistingOrder = function() {
             console.log('loading data for existing order: ' + $scope.orderId);
 
-            console.log('first, load empty order template');
+            console.log('first, load empty order template (all products)');
             $scope.loadEmptyOrder().then(function() {
                 if ($scope.ajaxError) {
                     return;
@@ -105,7 +106,10 @@ appModule.controller("OrderController", function($scope, $location, $http) {
 
 
 
-        // auto-load (if enabled)
+
+        // Issue the AJAX data load automatically (can be switched on/off)
+        $scope.autoLoad = true;
+
         if ($scope.autoLoad) {
             console.log('auto load (AJAX)');
             if ($scope.orderId) {
