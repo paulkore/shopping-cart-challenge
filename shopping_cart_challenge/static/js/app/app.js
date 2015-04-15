@@ -14,9 +14,8 @@ appModule.controller("OrderController", function($scope, $location, $http) {
         // decide whether it's a new or an existing order based on the URL
         // (this feels wrong, but it'll do for now)
         $scope.url = $location.absUrl();
-        console.log('url = ' + $scope.url);
         if (!$scope.url.contains('orders/new')) {
-            $scope.formTitle = 'Existing order'
+            $scope.formTitle = 'Existing order';
 
             // TODO: improve this ID extraction code, as it is unreliable (it grabs the right-most numeric value)
             var numericValues = $scope.url.match( /\d+/g);
