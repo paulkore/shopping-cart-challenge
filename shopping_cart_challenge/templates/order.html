@@ -22,8 +22,8 @@
 
             <div class="ajax-controls" ng-if="!autoLoad">
                 AJAX actions:
-                <button ng-if="!orderId" ng-click="prepareNewOrderForm()">Prepare form: new order </button>
-                <button ng-if="orderId" ng-click="prepareExistingOrderForm()">Prepare form: existing order</button>
+                <button ng-if="!orderId" ng-click="prepareNewOrderForm()">Prepare form (new order)</button>
+                <button ng-if="orderId" ng-click="prepareExistingOrderForm()">Prepare form (existing order)</button>
             </div>
             <div class="error-message" ng-if="ajaxError" ng-bind="ajaxError"></div>
 
