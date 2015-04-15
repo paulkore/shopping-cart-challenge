@@ -22,11 +22,12 @@
 
             <div class="ajax-controls" ng-if="!autoLoad">
                 AJAX actions:
-                <button ng-click="loadEmptyOrder()">Load empty order form</button>
+                <button ng-if="!orderId" ng-click="prepareNewOrderForm()">Prepare form: new order </button>
+                <button ng-if="orderId" ng-click="prepareExistingOrderForm()">Prepare form: existing order</button>
             </div>
             <div class="error-message" ng-if="ajaxError" ng-bind="ajaxError"></div>
 
-            <form class="product-table" ng-if="products">
+            <form class="product-table" ng-if="formProducts">
 
                 <div class="product-header">
                      <div class="product-col product-col-header product-col-name">Product</div>
@@ -34,20 +35,20 @@
                      <div class="product-col product-col-header product-col-quantity">Quantity</div>
                 </div>
 
-                <div class="product-row" ng-repeat="product in products">
+                <div class="product-row" ng-repeat="formProduct in formProducts">
                     <div class="product-col product-col-name">
-                        {{ product.name }}
+                        {{ formProduct.product.name }}
                     </div>
                     <div class="product-col product-col-price product-col-numeric">
-                        {{ product.price }}
+                        {{ formProduct.product.price }}
                     </div>
                     <div class="product-col product-col-quantity" ng-switch="orderStatus">
                         <div ng-switch-when="EDIT">
-                            <input type="checkbox" ng-model="product.check">
-                            <input type="text" ng-model="product.quantity">
+                            <input type="checkbox" ng-model="formProduct.check">
+                            <input type="text" ng-model="formProduct.quantity">
                         </div>
                         <div ng-switch-when="REVIEW">
-                            {{ product.quantity }}
+                            {{ formProduct.quantity }}
                         </div>
                     </div>
                 </div>
