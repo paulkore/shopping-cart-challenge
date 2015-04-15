@@ -14,14 +14,14 @@ class Product(models.Model):
 
 
 class OrderStatus(enum.Enum):
-    STARTED = 1
+    EDIT = 1
     REVIEW = 2
     CONFIRMED = 3
 
     @staticmethod
     def to_str(val):
-        if val == OrderStatus.STARTED:
-            return 'STARTED'
+        if val == OrderStatus.EDIT:
+            return 'EDIT'
         if val == OrderStatus.REVIEW:
             return 'REVIEW'
         if val == OrderStatus.CONFIRMED:
@@ -30,7 +30,7 @@ class OrderStatus(enum.Enum):
 
 
 class Order(models.Model):
-    status = enum.EnumField(OrderStatus, default=OrderStatus.STARTED)
+    status = enum.EnumField(OrderStatus, default=OrderStatus.EDIT)
 
     class Meta:
         db_table = 'sc_order'
