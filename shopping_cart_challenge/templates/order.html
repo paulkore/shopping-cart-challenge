@@ -6,23 +6,25 @@
         <link rel="stylesheet" href="{% static 'css/style.css' %}" />
         <script src="{% static 'js/ng/angular.js' %}"></script>
 {#        <script src="{% static 'js/ng/angular.min.js' %}"></script>#}
+
+        <script src="{% static 'js/app/common.js' %}"></script>
         <script src="{% static 'js/app/app.js' %}"></script>
+
     </head>
 
-    {% verbatim %}
     <body ng-app="ShoppingCartChallenge">
 
+        {% verbatim %}
         <div class="mainWrapper" ng-controller="OrderController" >
-
             <div class="form-title">
-                New order
+                {{ formTitle }}
             </div>
 
             <div class="ajax-controls" ng-if="!autoLoad">
                 AJAX actions:
-                <button ng-click="loadNewOrder(item, $event)">Load new order form</button>
-                <div class="error-message" ng-if="ajaxError" ng-bind="ajaxError"></div>
+                <button ng-click="loadEmptyOrder()">Load empty order form</button>
             </div>
+            <div class="error-message" ng-if="ajaxError" ng-bind="ajaxError"></div>
 
             <form class="product-table" ng-if="products">
 
@@ -51,7 +53,8 @@
             </form>
 
         </div>
+        {% endverbatim %}
 
     </body>
-    {% endverbatim %}
+
 </html>

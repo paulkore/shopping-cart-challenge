@@ -11,22 +11,25 @@ def info_view(request):
     return render(request, 'info.html')
 
 
+
+#
+#  API views are below
+#
+
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all().order_by('name')
     serializer_class = ProductSerializer
 
 
-class OrderDetail(APIView):
+class ExistingOrderAPIView(APIView):
 
     @staticmethod
-    def get_object(pk):
+    def get(request, pk, format=None):
         try:
-            return Order.objects.get(pk=pk)
+            order = Order.objects.get(pk=pk)
         except Order.DoesNotExist:
             raise Http404
 
-    def get(self, request, pk, format=None):
-        order = self.get_object(pk)
         product_quantities = order.product_quantities()
 
         response_data = {}
