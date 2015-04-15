@@ -29,7 +29,7 @@ body {
     font-weight: bold;
     margin-bottom: 20px;
 
-    color: #747474;
+    color: #545454;
 }
 
 .ajax-controls {
@@ -49,6 +49,17 @@ body {
 .product-header {
     margin-bottom: 10px;
 }
+
+.product-footer {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.product-footer .product-col-name {
+    font-weight: bold;
+    color: #545454;
+}
+
 
 .product-row {
     margin-bottom: 4px;
@@ -70,7 +81,7 @@ body {
     color: #FEFEFE;
 }
 
-.product-col-numeric {
+.align-right {
     text-align: right;
 }
 

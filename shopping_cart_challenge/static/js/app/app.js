@@ -5,6 +5,7 @@ appModule.controller("OrderController", function($scope, $location, $http) {
         $scope.formTitle = 'New order';
         $scope.orderId = null;
         $scope.orderStatus = 'EDIT';
+        $scope.orderTotal = null;
         $scope.orderProducts = null;
         $scope.catalogueProducts = null;
         $scope.formProducts = null;
@@ -52,11 +53,13 @@ appModule.controller("OrderController", function($scope, $location, $http) {
             console.log('loading data for existing order: ' + $scope.orderId);
 
             $scope.orderProducts = null;
+            $scope.orderTotal = null;
             $scope.ajaxError = null;
 
             var promise = $http.get("/api/orders/" + $scope.orderId);
             promise.success(function(data) {
                 $scope.orderStatus = data.order_status;
+                $scope.orderTotal = data.order_total;
                 $scope.orderProducts = data.products;
             });
             promise.error(function(data) {
@@ -145,6 +148,10 @@ appModule.controller("OrderController", function($scope, $location, $http) {
 
             console.error('form product not found for id: ' + productId);
             return null;
+        };
+
+        $scope.displayTotal = function() {
+            return $scope.orderStatus == 'REVIEW' || $scope.orderStatus == 'CONFIRMED';
         };
 
         $scope.modifyOrder = function() {

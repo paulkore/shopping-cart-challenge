@@ -39,7 +39,7 @@
                     <div class="product-col product-col-name">
                         {{ formProduct.product.name }}
                     </div>
-                    <div class="product-col product-col-price product-col-numeric">
+                    <div class="product-col product-col-price align-right">
                         {{ formProduct.product.price }}
                     </div>
                     <div class="product-col product-col-quantity" ng-switch="orderStatus">
@@ -51,6 +51,12 @@
                             {{ formProduct.quantity }}
                         </div>
                     </div>
+                </div>
+
+                <div class="product-footer" ng-if="displayTotal()">
+                    <div class="product-col product-col-footer product-col-name align-right">TOTAL:</div>
+                    <div class="product-col product-col-footer product-col-price align-right">{{ orderTotal }}</div>
+                    <div class="product-col product-col-footer product-col-quantity"></div>
                 </div>
 
                 <div class="form-controls" ng-switch="orderStatus">

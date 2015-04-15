@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.http import Http404
 from django.shortcuts import render
 from rest_framework import viewsets
@@ -32,16 +33,18 @@ class ExistingOrderAPIView(APIView):
 
         product_quantities = order.product_quantities()
 
-        response_data = {}
-        response_data['order_id'] = order.id
-        response_data['order_status'] = OrderStatus.to_str(order.status)
-        pq_list = []
+        response_data = {
+            'order_id': order.id,
+            'order_status': OrderStatus.to_str(order.status),
+            'order_total': Decimal(0),
+            'products': []
+        }
         for pq in product_quantities:
-            pq_list.append({
+            response_data['products'].append({
                 'quantity': pq.quantity,
                 'product': ProductSerializer(pq.product).data
             })
-        response_data['products'] = pq_list
+            response_data['order_total'] += pq.product.price * pq.quantity
 
         return Response(response_data)
 
