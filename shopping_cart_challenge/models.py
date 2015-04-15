@@ -18,6 +18,17 @@ class OrderStatus(enum.Enum):
     REVIEW = 2
     CONFIRMED = 3
 
+    @staticmethod
+    def to_str(val):
+        if val == OrderStatus.STARTED:
+            return 'STARTED'
+        if val == OrderStatus.REVIEW:
+            return 'REVIEW'
+        if val == OrderStatus.CONFIRMED:
+            return 'CONFIRMED'
+        raise AssertionError('unhandled enum value: ' + str(val))
+
+
 class Order(models.Model):
     status = enum.EnumField(OrderStatus, default=OrderStatus.STARTED)
 
@@ -28,7 +39,7 @@ class Order(models.Model):
         return "Order (id: %d)" % self.id
 
     def product_quantities(self):
-        return ProductQuantity.filter(order_id=self.id).order_by('id')
+        return ProductQuantity.objects.filter(order_id=self.id).order_by('id')
 
 
 

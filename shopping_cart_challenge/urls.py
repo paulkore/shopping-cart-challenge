@@ -9,7 +9,6 @@ from shopping_cart_challenge.views import ProductViewSet
 api_router = routers.DefaultRouter()
 api_router.register(r'products', ProductViewSet)
 
-
 urlpatterns = patterns('',
 
     url(r'^$', views.info_view),
@@ -17,9 +16,10 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^api/', include(api_router.urls)),
+    url(r'^api/orders/(?P<pk>[0-9]+)/$', views.OrderDetail.as_view()),
 
     # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
-    url(r'^order/', TemplateView.as_view(template_name='order.html')),
+    url(r'^orders/new', TemplateView.as_view(template_name='order.html')),
 
 )
