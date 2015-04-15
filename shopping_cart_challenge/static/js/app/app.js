@@ -106,8 +106,9 @@ appModule.controller("OrderController", function($scope, $location, $http) {
                 }
                 else if ($scope.orderStatus == 'EDIT') {
                     console.log('preparing form for order being edited - need to load the catalogue');
-
+                    
                     $scope.loadCatalogueProducts().then(function() {
+                        console.log('applying existing order data to blank order from');
 
                         // 'new order' form used as a base for 'edit order' form
                         for (var i=0; i<$scope.catalogueProducts.length; i++) {
@@ -140,7 +141,7 @@ appModule.controller("OrderController", function($scope, $location, $http) {
             // TODO: sequential search... not ideal, but it will do for now.
             for (var i=0; i<$scope.formProducts.length; i++) {
                 var formProduct = $scope.formProducts[i];
-                if (formProduct.id === productId) {
+                if (formProduct.product.id == productId) {
                     return formProduct;
                 }
             }
