@@ -114,9 +114,9 @@ TEMPLATE_DIRS = (
 
 
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
+    # Open API - no restrictions!
+    # TODO: this has to be secured eventually
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly'
+        'rest_framework.permissions.AllowAny'
     ]
 }
