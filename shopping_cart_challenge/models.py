@@ -18,15 +18,31 @@ class OrderStatus(enum.Enum):
     REVIEW = 2
     CONFIRMED = 3
 
+    _str_to_val = {
+        'EDIT': EDIT,
+        'REVIEW': REVIEW,
+        'CONFIRMED': CONFIRMED,
+    }
+
+    _val_to_str = {
+        EDIT: 'EDIT',
+        REVIEW: 'REVIEW',
+        CONFIRMED: 'CONFIRMED',
+    }
+
     @staticmethod
     def to_str(val):
-        if val == OrderStatus.EDIT:
-            return 'EDIT'
-        if val == OrderStatus.REVIEW:
-            return 'REVIEW'
-        if val == OrderStatus.CONFIRMED:
-            return 'CONFIRMED'
-        raise AssertionError('unhandled enum value: ' + str(val))
+        if val in OrderStatus._val_to_str:
+            return OrderStatus._val_to_str[val]
+        raise Exception('invalid enum value: ' + str(val))
+
+    @staticmethod
+    def from_str(str):
+        if str in OrderStatus._str_to_val:
+            return OrderStatus._str_to_val[str]
+        raise Exception('invalid enum value: ' + str)
+
+
 
 
 class Order(models.Model):
