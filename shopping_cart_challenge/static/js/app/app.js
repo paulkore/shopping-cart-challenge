@@ -1,4 +1,10 @@
-appModule = angular.module("ShoppingCartChallenge", []);
+var appModule = angular.module("ShoppingCartChallenge", ['ngCookies']);
+
+appModule.run( function run( $http, $cookies ){
+
+    // For CSRF token compatibility with Django
+    $http.defaults.headers.post['X-CSRFToken'] = $cookies['csrftoken'];
+});
 
 appModule.controller("OrderController", function($scope, $location, $http) {
 
@@ -9,6 +15,7 @@ appModule.controller("OrderController", function($scope, $location, $http) {
         $scope.orderProducts = null;
         $scope.catalogueProducts = null;
         $scope.formProducts = null;
+
         $scope.ajaxError = null;
 
         // decide whether it's a new or an existing order based on the URL
@@ -22,6 +29,14 @@ appModule.controller("OrderController", function($scope, $location, $http) {
             $scope.orderId = Number(numericValues.last());
         }
 
+        $scope.prepareForm = function() {
+            if ($scope.orderId) {
+                $scope.prepareExistingOrderForm();
+            }
+            else {
+                $scope.prepareNewOrderForm();
+            }
+        };
 
         $scope.loadCatalogueProducts = function() {
             console.log('loading list of all products');
@@ -106,7 +121,7 @@ appModule.controller("OrderController", function($scope, $location, $http) {
                 }
                 else if ($scope.orderStatus == 'EDIT') {
                     console.log('preparing form for order being edited - need to load the catalogue');
-                    
+
                     $scope.loadCatalogueProducts().then(function() {
                         console.log('applying existing order data to blank order from');
 
@@ -154,40 +169,91 @@ appModule.controller("OrderController", function($scope, $location, $http) {
             return $scope.orderStatus == 'REVIEW' || $scope.orderStatus == 'CONFIRMED';
         };
 
-        $scope.modifyOrder = function() {
-            console.log('submitting order for modification');
 
-            alert('not implemented')
+        $scope.modifyOrder = function() {
+            console.log('submitting order: modify');
+
+            var postData = {};
+            postData.order_status = 'EDIT';
+            postData.product_quantities = [];
+
+            $scope.submitOrderData($scope.getPOSTUrl(), postData);
         };
 
         $scope.reviewOrder = function() {
-            console.log('submitting order for review');
+            console.log('submitting order: review');
 
-            alert('not implemented')
+            var postData = {};
+            postData.order_status = 'REVIEW';
+            postData.product_quantities = [];
+            for (var i=0; i<$scope.formProducts.length; i++) {
+                var formProduct = $scope.formProducts[i];
+                if (formProduct.check && formProduct.quantity && formProduct.quantity > 0) {
+                    var pq_item = {
+                        quantity: formProduct.quantity,
+                        product_id: formProduct.product.id
+                    };
+                    postData.product_quantities.push(pq_item);
+                }
+            }
+
+            $scope.submitOrderData($scope.getPOSTUrl(), postData);
         };
 
         $scope.confirmOrder = function() {
-            console.log('submitting order for confirmation');
+            console.log('submitting order: confirm');
 
-            alert('not implemented')
+            var postData = {};
+            postData.order_status = 'CONFIRMED';
+            postData.product_quantities = [];
+
+            $scope.submitOrderData($scope.getPOSTUrl(), postData);
+        };
+
+        $scope.getPOSTUrl = function() {
+            if ($scope.orderId) {
+                return '/api/orders/' + $scope.orderId
+            }
+            else {
+                return '/api/orders';
+            }
+        };
+
+        $scope.submitOrderData = function(postUrl, postData) {
+            console.log('Submitting form (POST request via AJAX)');
+
+            $scope.ajaxError = null;
+
+            var promise = $http.post(postUrl, postData);
+            promise.success(function(data, status, headers, config) {
+                console.log('POST request returned successfully');
+                if (data.order_id) {
+                    $scope.orderId = data.order_id;
+                    $scope.prepareForm();
+                }
+                else {
+                    $scope.ajaxError = 'Unexpected data returned from (AJAX call failed)';
+                }
+            });
+            promise.error(function(data, status, headers, config) {
+                $scope.ajaxError = 'Could not load data (AJAX call failed)';
+            });
         };
 
 
 
 
+        // Toggle dev controls
+        $scope.showDevControls = false;
 
         // Issue the AJAX data load automatically (can be switched on/off)
         $scope.autoLoad = true;
 
         if ($scope.autoLoad) {
             console.log('auto load (AJAX)');
-            if ($scope.orderId) {
-                $scope.prepareExistingOrderForm();
-            }
-            else {
-                $scope.prepareNewOrderForm();
-            }
+            $scope.prepareForm();
         }
+
 
 
     });

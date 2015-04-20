@@ -16,7 +16,8 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^api/', include(api_router.urls)),
-    url(r'^api/orders/(?P<pk>[0-9]+)', views.ExistingOrderAPIView.as_view()),
+    url(r'^api/orders/(?P<pk>[0-9]+)', views.OrderAPIView.as_view()),
+    url(r'^api/orders$', views.OrderAPIView.as_view()),
 
     url(r'^orders/new', TemplateView.as_view(template_name='order.html')),
     url(r'^orders/(?P<pk>[0-9]+)', TemplateView.as_view(template_name='order.html')),

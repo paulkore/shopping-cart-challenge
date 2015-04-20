@@ -5,11 +5,9 @@
     <head>
         <link rel="stylesheet" href="{% static 'css/style.css' %}" />
         <script src="{% static 'js/ng/angular.js' %}"></script>
-{#        <script src="{% static 'js/ng/angular.min.js' %}"></script>#}
-
+        <script src="{% static 'js/ng/angular-cookies.js' %}"></script>
         <script src="{% static 'js/app/common.js' %}"></script>
         <script src="{% static 'js/app/app.js' %}"></script>
-
     </head>
 
     <body ng-app="ShoppingCartChallenge">
@@ -20,14 +18,14 @@
                 {{ formTitle }}
             </div>
 
-            <div class="ajax-controls" ng-if="!autoLoad">
+            <div class="ajax-controls" ng-if="showDevControls">
                 AJAX actions:
                 <button ng-if="!orderId" ng-click="prepareNewOrderForm()">Prepare form (new order)</button>
                 <button ng-if="orderId" ng-click="prepareExistingOrderForm()">Prepare form (existing order)</button>
             </div>
             <div class="error-message" ng-if="ajaxError" ng-bind="ajaxError"></div>
 
-            <form class="product-table" ng-if="formProducts">
+            <div class="product-table" ng-if="formProducts">
 
                 <div class="product-header">
                      <div class="product-col product-col-header product-col-name">Product</div>
@@ -64,7 +62,7 @@
                     <button ng-switch-when="REVIEW" ng-click="modifyOrder(item, $event)">Back</button>
                     <button ng-switch-when="REVIEW" ng-click="confirmOrder(item, $event)">Confirm</button>
                 </div>
-            </form>
+            </div>
 
         </div>
         {% endverbatim %}
