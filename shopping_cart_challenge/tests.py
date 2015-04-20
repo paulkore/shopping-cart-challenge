@@ -5,14 +5,11 @@ from shopping_cart_challenge.models import Product, Order, ProductQuantity
 
 class OrderModelTests(TestCase):
 
-    @staticmethod
-    def _createProduct(name, price):
-        return
 
     def setUp(self):
-        self.assertTrue(len(Product.objects.all()) == 0, 'Start with and empty database')
-        self.assertTrue(len(Order.objects.all()) == 0, 'Start with and empty database')
-        self.assertTrue(len(ProductQuantity.objects.all()) == 0, 'Start with and empty database')
+        self.assertTrue(len(Product.objects.all()) == 0, 'Start with empty db')
+        self.assertTrue(len(Order.objects.all()) == 0, 'Start with empty db')
+        self.assertTrue(len(ProductQuantity.objects.all()) == 0, 'Start with empty db')
 
     def test_product_quantities_empty_order(self):
         Product.objects.create(name='product1', price=10.00)
