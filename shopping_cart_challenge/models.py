@@ -31,6 +31,10 @@ class OrderStatus(enum.Enum):
     }
 
     @staticmethod
+    def all_values_str():
+        return ['EDIT', 'REVIEW', 'CONFIRMED']
+
+    @staticmethod
     def to_str(val):
         if val in OrderStatus._val_to_str:
             return OrderStatus._val_to_str[val]
@@ -41,6 +45,7 @@ class OrderStatus(enum.Enum):
         if str in OrderStatus._str_to_val:
             return OrderStatus._str_to_val[str]
         raise Exception('invalid enum value: ' + str)
+
 
 
 
