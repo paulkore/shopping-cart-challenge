@@ -52,6 +52,8 @@ class OrderStatus(enum.Enum):
 
 class Order(models.Model):
     status = enum.EnumField(OrderStatus, default=OrderStatus.EDIT)
+    total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    confirmation_number = models.CharField(max_length=50, null=True, blank=False)
 
     class Meta:
         db_table = 'sc_order'
