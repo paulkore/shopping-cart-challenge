@@ -20,8 +20,8 @@
 
             <div class="ajax-controls" ng-if="showDevControls">
                 AJAX actions:
-                <button ng-if="!orderId" ng-click="prepareNewOrderForm()">Prepare form (new order)</button>
-                <button ng-if="orderId" ng-click="prepareExistingOrderForm()">Prepare form (existing order)</button>
+                <button class="form-button" ng-if="!orderId" ng-click="prepareNewOrderForm()">Prepare form (new order)</button>
+                <button class="form-button" ng-if="orderId" ng-click="prepareExistingOrderForm()">Prepare form (existing order)</button>
             </div>
             <div class="error-message" ng-if="ajaxError" ng-bind="ajaxError"></div>
 
@@ -58,9 +58,9 @@
                 </div>
 
                 <div class="form-controls" ng-switch="orderStatus">
-                    <button ng-switch-when="EDIT" ng-click="reviewOrder(item, $event)">Review</button>
-                    <button ng-switch-when="REVIEW" ng-click="modifyOrder(item, $event)">Back</button>
-                    <button ng-switch-when="REVIEW" ng-click="confirmOrder(item, $event)">Confirm</button>
+                    <button class="form-button" ng-switch-when="EDIT" ng-click="reviewOrder(item, $event)">Review</button>
+                    <button class="form-button" ng-switch-when="REVIEW" ng-click="modifyOrder(item, $event)">Back</button>
+                    <button class="form-button" ng-switch-when="REVIEW" ng-click="confirmOrder(item, $event)">Confirm</button>
                 </div>
             </div>
 
