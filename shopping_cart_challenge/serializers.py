@@ -1,7 +1,8 @@
 from decimal import Decimal
 from django.db import transaction
 from rest_framework import serializers
-from shopping_cart_challenge.models import Product, OrderStatus, Order, ProductQuantity
+from shopping_cart_challenge.models import Product, OrderStatus
+from shopping_cart_challenge.services import OrderService
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -40,84 +41,64 @@ class ProductQuantityWriteSerializer(serializers.Serializer):
     quantity = serializers.IntegerField()
 
 
-# noinspection PyAbstractClass
+# noinspection PyAbstractClass, PyMethodMayBeStatic
 class OrderWriteSerializer(serializers.Serializer):
     order_status = serializers.ChoiceField(choices=OrderStatus.all_values_str())
     product_quantities = ProductQuantityWriteSerializer(many=True, required=False, allow_null=True)
 
 
-    def _sync_product_quantities(self, order, prod_quantities_data):
-        current_pq_dict = {}
-        current_pq_objects = {}
-        for pq in order.product_quantities():
-            assert pq.product_id not in current_pq_dict, 'key collision'
-            current_pq_dict[pq.product_id] = pq.quantity
-            current_pq_objects[pq.product_id] = pq
+    # def __init__(self, *args, **kwargs):
+    #     super(OrderWriteSerializer, self).__init__(args, kwargs)
+    #     self.order_service = OrderService()
 
-        new_pq_dict = {}
-        for pq in prod_quantities_data:
-            assert pq['product_id'] not in new_pq_dict, 'key collision'
-            new_pq_dict[pq['product_id']] = pq['quantity']
+    def _extract_order_status(self, validated_data):
+        order_status_str = validated_data.get('order_status')
+        order_status = OrderStatus.from_str(order_status_str)
+        return order_status
 
 
-        for prod_id in current_pq_dict:
-            if prod_id in new_pq_dict:
-                # update changed product quantities, if applicable
-                curr_obj = current_pq_objects[prod_id]
-                new_quantity = new_pq_dict.pop(prod_id)
-                if curr_obj.quantity != new_quantity:
-                    curr_obj.quantity = new_quantity
-                    curr_obj.save()
-            else:
-                # get rid of quantity records for products that are no longer applicable
-                current_pq_objects[prod_id].delete()
+    def _extract_prod_quantities(self, validated_data):
+        pq_data = validated_data.get('product_quantities')
+        pq_dict = {}
+        for pq in pq_data:
+            product_id = pq['product_id']
+            quantity = pq['quantity']
 
-        # create quantity records for newly-added products
-        for new_prod_id in new_pq_dict:
-            new_pq_object = ProductQuantity.objects.create(
-                order_id=order.id,
-                product_id=new_prod_id,
-                quantity=new_pq_dict[new_prod_id],
-            )
-            new_pq_object.save()
+            assert product_id not in pq_dict, 'key collision'
+            pq_dict[product_id] = quantity
+
+        return pq_dict
 
 
     def create(self, validated_data):
-        with transaction.atomic():
-            new_order = Order.objects.create(status=OrderStatus.REVIEW)
-            new_order.save()
+        # TODO: make this an instance variable
+        order_service = OrderService()
 
-            pq_data = validated_data.get('product_quantities')
-            self._sync_product_quantities(new_order, pq_data)
-
+        prod_quantities = self._extract_prod_quantities(validated_data)
+        new_order = order_service.create_new_order(product_quantities=prod_quantities)
         return new_order
 
 
     def update(self, instance, validated_data):
-        status_str = validated_data.get('order_status', instance.status)
-        status = OrderStatus.from_str(status_str)
+        # TODO: make this an instance variable
+        order_service = OrderService()
+
+        order_status = self._extract_order_status(validated_data)
+        prod_quantities = self._extract_prod_quantities(validated_data)
 
         with transaction.atomic():
+            if order_status == OrderStatus.EDIT:
+                order_service.set_status_edit(instance)
 
-            if status == OrderStatus.EDIT or status == OrderStatus.CONFIRMED:
-                instance.status = status
-                instance.save()
+            elif order_status == OrderStatus.REVIEW:
+                order_service.update_prod_quantities(instance, new_product_quantities=prod_quantities)
+                order_service.set_status_review(instance)
 
-            elif status == OrderStatus.REVIEW:
-                instance.status = status
-                instance.save()
-
-                pq_data = validated_data.get('product_quantities')
-                self._sync_product_quantities(instance, pq_data)
-
-            elif status == OrderStatus.CONFIRMED:
-                instance.status = status
-                instance.save()
-
-                # TODO: generate confirmation number
+            elif order_status == OrderStatus.CONFIRMED:
+                order_service.set_status_confirmed(instance)
 
             else:
-                raise Exception('Unhandled enum value: ' + str(status))
+                raise Exception('Unhandled enum value: ' + str(order_status))
 
         return instance
 
