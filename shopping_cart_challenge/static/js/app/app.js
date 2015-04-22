@@ -15,79 +15,63 @@ appModule.controller("OrderController", function($scope, $location, $http) {
         $scope.orderProducts = null;
         $scope.catalogueProducts = null;
         $scope.formProducts = null;
-
         $scope.ajaxError = null;
 
-        // decide whether it's a new or an existing order based on the URL
-        // (this feels wrong, but it'll do for now)
-        $scope.url = $location.absUrl();
-        if (!$scope.url.contains('orders/new')) {
+
+        // Decide whether it's a new or an existing order based on the URL; This is bad, but it'll do for now.
+        // TODO: Look into Angular routing to implement properly.
+        var url = $location.absUrl();
+        if (!url.contains('orders/new')) {
             $scope.formTitle = 'Existing order';
 
-            // TODO: improve this ID extraction code, as it is unreliable (it grabs the right-most numeric value)
-            var numericValues = $scope.url.match( /\d+/g);
+            // This ID extraction code grabs the right-most numeric value
+            // TODO: improve, because this is unreliable
+            var numericValues = url.match( /\d+/g);
             $scope.orderId = Number(numericValues.last());
         }
 
-        $scope.prepareForm = function() {
+
+
+        // expose function for click handlers
+        $scope.onClickPrepareForm = prepareForm;
+        $scope.onClickReviewOrder = reviewOrder;
+        $scope.onClickModifyOrder = modifyOrder;
+        $scope.onClickConfirmOrder = confirmOrder;
+
+
+
+
+        // decider function: to display order total or not
+        $scope.displayTotal = function() {
+            return $scope.orderStatus == 'REVIEW' || $scope.orderStatus == 'CONFIRMED';
+        };
+
+
+        // Toggle dev controls
+        $scope.showDevControls = false;
+
+        // Issue the AJAX data load automatically (can be switched on/off)
+        var autoLoad = true;
+        if (autoLoad) {
+            console.log('auto load (AJAX)');
+            prepareForm();
+        }
+
+
+
+        function prepareForm() {
             if ($scope.orderId) {
-                $scope.prepareExistingOrderForm();
+                prepareExistingOrderForm();
             }
             else {
-                $scope.prepareNewOrderForm();
+                prepareNewOrderForm();
             }
-        };
+        }
 
-        $scope.loadCatalogueProducts = function() {
-            console.log('loading list of all products');
-
-            $scope.catalogueProducts = null;
-            $scope.ajaxError = null;
-
-            var promise = $http.get("/api/products");
-            promise.success(function(data) {
-                $scope.catalogueProducts = [];
-                for (var i=0; i<data.length; i++) {
-                    var product_data = data[i];
-                    var product = {};
-                    product.id = product_data.id;
-                    product.name = product_data.name;
-                    product.price = product_data.price;
-                    $scope.catalogueProducts.push(product)
-                }
-            });
-            promise.error(function(data) {
-                $scope.ajaxError = 'Could not load data (AJAX call failed)';
-            });
-
-            return promise;
-        };
-
-        $scope.loadExistingOrder = function() {
-            console.log('loading data for existing order: ' + $scope.orderId);
-
-            $scope.orderProducts = null;
-            $scope.orderTotal = null;
-            $scope.ajaxError = null;
-
-            var promise = $http.get("/api/orders/" + $scope.orderId);
-            promise.success(function(data) {
-                $scope.orderStatus = data.order_status;
-                $scope.orderTotal = data.order_total;
-                $scope.orderProducts = data.products;
-            });
-            promise.error(function(data) {
-                $scope.ajaxError = 'Could not load data (AJAX call failed)';
-            });
-
-            return promise;
-        };
-
-
-        $scope.prepareNewOrderForm = function() {
+        function prepareNewOrderForm() {
             console.log('preparing form for new order');
 
-            $scope.loadCatalogueProducts().then(function() {
+            loadCatalogueProducts().then(function() {
                 $scope.formProducts = [];
 
                 for (var i=0; i<$scope.catalogueProducts.length; i++) {
@@ -98,12 +82,12 @@ appModule.controller("OrderController", function($scope, $location, $http) {
                     $scope.formProducts.push(formProduct);
                 }
             });
-        };
+        }
 
-        $scope.prepareExistingOrderForm = function() {
+        function prepareExistingOrderForm() {
             console.log('preparing form for existing order');
 
-            $scope.loadExistingOrder().then(function(){
+            loadExistingOrder().then(function(){
                 $scope.formProducts = [];
 
                 if ($scope.orderStatus == 'CONFIRMED' || $scope.orderStatus == 'REVIEW') {
@@ -122,11 +106,11 @@ appModule.controller("OrderController", function($scope, $location, $http) {
                 else if ($scope.orderStatus == 'EDIT') {
                     console.log('preparing form for order being edited - need to load the catalogue');
 
-                    $scope.loadCatalogueProducts().then(function() {
+                    loadCatalogueProducts().then(function() {
                         console.log('applying existing order data to blank order from');
 
                         // 'new order' form used as a base for 'edit order' form
-                        for (var i=0; i<$scope.catalogueProducts.length; i++) {
+                        for (var i=0; i < $scope.catalogueProducts.length; i++) {
                             var formProduct = {};
                             formProduct.product = $scope.catalogueProducts[i];
                             formProduct.check = false;
@@ -137,7 +121,7 @@ appModule.controller("OrderController", function($scope, $location, $http) {
                         // populate the blank form with data from the existing order
                         for (var j=0; j<$scope.orderProducts.length; j++) {
                             var orderProduct = $scope.orderProducts[j];
-                            var formProd = $scope.findFormProduct(orderProduct.product.id);
+                            var formProd = findFormProduct(orderProduct.product.id);
 
                             formProd.check = true;
                             formProd.quantity = orderProduct.quantity;
@@ -150,9 +134,54 @@ appModule.controller("OrderController", function($scope, $location, $http) {
 
             });
 
-        };
+        }
 
-        $scope.findFormProduct = function(productId) {
+        function loadCatalogueProducts() {
+            console.log('loading list of all products');
+
+            $scope.catalogueProducts = null;
+            $scope.ajaxError = null;
+
+            var promise = $http.get("/api/products");
+            promise.success(function(data) {
+                $scope.catalogueProducts = [];
+                for (var i=0; i<data.length; i++) {
+                    var product_data = data[i];
+                    var product = {};
+                    product.id = product_data['id'];
+                    product.name = product_data['name'];
+                    product.price = product_data['price'];
+                    $scope.catalogueProducts.push(product)
+                }
+            });
+            promise.error(function(data) {
+                $scope.ajaxError = 'Could not load data (AJAX call failed)';
+            });
+
+            return promise;
+        }
+
+        function loadExistingOrder() {
+            console.log('loading data for existing order: ' + $scope.orderId);
+
+            $scope.orderProducts = null;
+            $scope.orderTotal = null;
+            $scope.ajaxError = null;
+
+            var promise = $http.get("/api/orders/" + $scope.orderId);
+            promise.success(function(data) {
+                $scope.orderStatus = data['order_status'];
+                $scope.orderTotal = data['order_total'];
+                $scope.orderProducts = data['products'];
+            });
+            promise.error(function(data) {
+                $scope.ajaxError = 'Could not load data (AJAX call failed)';
+            });
+
+            return promise;
+        }
+
+        function findFormProduct(productId) {
             // TODO: sequential search... not ideal, but it will do for now.
             for (var i=0; i<$scope.formProducts.length; i++) {
                 var formProduct = $scope.formProducts[i];
@@ -163,24 +192,19 @@ appModule.controller("OrderController", function($scope, $location, $http) {
 
             console.error('form product not found for id: ' + productId);
             return null;
-        };
+        }
 
-        $scope.displayTotal = function() {
-            return $scope.orderStatus == 'REVIEW' || $scope.orderStatus == 'CONFIRMED';
-        };
-
-
-        $scope.modifyOrder = function() {
+        function modifyOrder() {
             console.log('submitting order: modify');
 
             var postData = {};
             postData.order_status = 'EDIT';
             postData.product_quantities = [];
 
-            $scope.submitOrderData($scope.getPOSTUrl(), postData);
-        };
+            submitOrderData(getPOSTUrl(), postData);
+        }
 
-        $scope.reviewOrder = function() {
+        function reviewOrder() {
             console.log('submitting order: review');
 
             var postData = {};
@@ -197,29 +221,29 @@ appModule.controller("OrderController", function($scope, $location, $http) {
                 }
             }
 
-            $scope.submitOrderData($scope.getPOSTUrl(), postData);
-        };
+            submitOrderData(getPOSTUrl(), postData);
+        }
 
-        $scope.confirmOrder = function() {
+        function confirmOrder() {
             console.log('submitting order: confirm');
 
             var postData = {};
             postData.order_status = 'CONFIRMED';
             postData.product_quantities = [];
 
-            $scope.submitOrderData($scope.getPOSTUrl(), postData);
-        };
+            submitOrderData(getPOSTUrl(), postData);
+        }
 
-        $scope.getPOSTUrl = function() {
+        function getPOSTUrl() {
             if ($scope.orderId) {
                 return '/api/orders/' + $scope.orderId
             }
             else {
                 return '/api/orders';
             }
-        };
+        }
 
-        $scope.submitOrderData = function(postUrl, postData) {
+        function submitOrderData(postUrl, postData) {
             console.log('Submitting form (POST request via AJAX)');
 
             $scope.ajaxError = null;
@@ -227,9 +251,9 @@ appModule.controller("OrderController", function($scope, $location, $http) {
             var promise = $http.post(postUrl, postData);
             promise.success(function(data, status, headers, config) {
                 console.log('POST request returned successfully');
-                if (data.order_id) {
-                    $scope.orderId = data.order_id;
-                    $scope.prepareForm();
+                if (data['order_id']) {
+                    $scope.orderId = data['order_id'];
+                    prepareForm();
                 }
                 else {
                     $scope.ajaxError = 'Unexpected data returned from (AJAX call failed)';
@@ -238,20 +262,6 @@ appModule.controller("OrderController", function($scope, $location, $http) {
             promise.error(function(data, status, headers, config) {
                 $scope.ajaxError = 'Could not load data (AJAX call failed)';
             });
-        };
-
-
-
-
-        // Toggle dev controls
-        $scope.showDevControls = false;
-
-        // Issue the AJAX data load automatically (can be switched on/off)
-        $scope.autoLoad = true;
-
-        if ($scope.autoLoad) {
-            console.log('auto load (AJAX)');
-            $scope.prepareForm();
         }
 
 
