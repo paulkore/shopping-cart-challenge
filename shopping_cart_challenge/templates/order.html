@@ -14,9 +14,8 @@
 
         {% verbatim %}
         <div class="mainWrapper" ng-controller="OrderController" >
-            <div class="form-title">
-                {{ formTitle }}
-            </div>
+            <div class="form-title" ng-if="!orderId">New order</div>
+            <div class="form-title" ng-if=" orderId">Existing order</div>
 
             <div class="ajax-controls" ng-if="showDevControls">
                 AJAX actions:
@@ -45,7 +44,7 @@
                             <input type="checkbox" ng-model="formProduct.check">
                             <input type="text" ng-model="formProduct.quantity">
                         </div>
-                        <div ng-switch-when="REVIEW">
+                        <div ng-switch-default>
                             {{ formProduct.quantity }}
                         </div>
                     </div>

@@ -8,7 +8,6 @@ appModule.run( function run( $http, $cookies ){
 
 appModule.controller("OrderController", function($scope, $location, $http) {
 
-        $scope.formTitle = 'New order';
         $scope.orderId = null;
         $scope.orderStatus = 'EDIT';
         $scope.orderTotal = null;
@@ -22,10 +21,8 @@ appModule.controller("OrderController", function($scope, $location, $http) {
         // TODO: Look into Angular routing to implement properly.
         var url = $location.absUrl();
         if (!url.contains('orders/new')) {
-            $scope.formTitle = 'Existing order';
-
             // This ID extraction code grabs the right-most numeric value
-            // TODO: improve, because this is unreliable
+            // TODO: improve, because this is unreliable (the next numeric value is the port number)
             var numericValues = url.match( /\d+/g);
             $scope.orderId = Number(numericValues.last());
         }
